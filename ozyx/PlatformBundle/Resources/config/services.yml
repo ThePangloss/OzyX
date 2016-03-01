@@ -1,0 +1,4 @@
+services:
+#    ozyx_platform.example:
+#        class: ozyx\PlatformBundle\Example
+#        arguments: ["@service_id", "plain_value", %parameter%]
