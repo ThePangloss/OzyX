@@ -1,0 +1,7 @@
+ozyx_platform:
+    resource: "@ozyxPlatformBundle/Resources/config/routing.yml"
+    prefix:   /platform
+
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation

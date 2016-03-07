@@ -1,0 +1,5 @@
+# src/OC/PlatformBundle/Resources/config/services.yml
+services:
+    ozyx_platform.antispam:
+        class: ozyx\PlatformBundle\Antispam\ozyxAntispam
+        arguments: ['@mailer', %locale%, 50]
