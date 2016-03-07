@@ -1,0 +1,29 @@
+# src/ozyx/PlatformBundle/Resources/config/routing.yml
+
+ozyx_platform_home:
+    path:      /{page}
+    defaults:  { _controller: ozyxPlatformBundle:Advert:index, page: 1 }
+    requirements:
+        page: \d*
+
+ozyx_platform_view:
+    path:      /advert/{id}
+    defaults:  { _controller: ozyxPlatformBundle:Advert:view }
+    requirements:
+        id: \d+
+
+ozyx_platform_add:
+    path:      /add
+    defaults:  { _controller: ozyxPlatformBundle:Advert:add }
+
+ozyx_platform_edit:
+    path:      /edit/{id}
+    defaults:  { _controller: ozyxPlatformBundle:Advert:edit }
+    requirements:
+        id: \d+
+
+ozyx_platform_delete:
+    path:      /delete/{id}
+    defaults:  { _controller: ozyxPlatformBundle:Advert:delete }
+    requirements:
+        id: \d+
