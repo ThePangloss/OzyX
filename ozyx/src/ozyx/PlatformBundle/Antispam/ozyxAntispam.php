@@ -1,5 +1,5 @@
 <?php
-// src/ozyx/PlatformBundle/Antispam/OCAntispam.php
+// src/ozyx/PlatformBundle/Antispam/ozyxAntispam.php
 
 namespace ozyx\PlatformBundle\Antispam;
 

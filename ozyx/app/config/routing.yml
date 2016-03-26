@@ -5,3 +5,7 @@ ozyx_platform:
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
+
+#Route pour le bundle permettant la manipulation des images
+_liip_imagine:
+    resource: "@LiipImagineBundle/Resources/config/routing.xml"

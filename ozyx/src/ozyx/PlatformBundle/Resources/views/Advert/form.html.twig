@@ -1,9 +1,193 @@
 {# src/ozyx/PlatformBundle/Resources/views/Advert/form.html.twig #}
 
-<h3>Formulaire d'annonce</h3>
-
-{# On laisse vide la vue pour l'instant, on la comblera plus tard
-   lorsqu'on saura afficher un formulaire. #}
 <div class="well">
-  Ici se trouvera le formulaire.
+  {{ form_start(formBuilder, {'attr': {'class': 'form-horizontal'}}) }}
+
+{% set divError = 'd' %}
+{% for field in formBuilder %}
+  {% if field.vars.errors is defined %}
+    {% if (field.vars.errors)|length > 0 %}     
+      {% set divError = 'divError' %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+    {% if divError == 'divError'  %}
+      <div class="well"  style="border-color: red; background-color: rgb(255, 68, 68); color: rgb(255,255,255); font-weight: bold; text-shadow: 2px 2px 1px #000;">
+      
+      {# Les erreurs générales du formulaire. #}
+      {{ form_errors(formBuilder) }}
+
+      {{ form_errors(formBuilder.title) }}
+      {{ form_errors(formBuilder.content) }}
+      {{ form_errors(formBuilder.author) }}
+      {% if formBuilder.published is defined %}
+        {{ form_errors(formBuilder.published) }}
+      {% endif %}
+      {{ form_errors(formBuilder.categories) }}
+      {% if formBuilder.image is defined %}
+        {{ form_errors(formBuilder.image.imageFile) }}
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {#{ dump(test) }#}
+    {# Champ de titre. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.title, "Titre de l'annonce", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.title, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ de contenu de l'annonce. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.content, "Contenu de l'annonce", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.content, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ de date. #}
+    {% if formBuilder.date is defined %}
+      <div class="form-group">
+      <div class="form-inline">
+        {{ form_label(formBuilder.date, "Date de création", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+        {% for dat in formBuilder.date %}
+          <div class="col-sm-1">  
+            {{ form_label(dat) }}
+            {{ form_widget(dat) }}
+          </div>
+        {% endfor %}
+      </div>
+      </div>
+    {% endif %}
+
+    {# Champ de l'autheur. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.author, "Auteur", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.author, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ de publication. #}
+    {% if formBuilder.published is defined %}
+    <div class="form-group">
+      {{ form_label(formBuilder.published, "Publier l'annonce ?", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="checkbox col-sm-4">
+        {{ form_widget(formBuilder.published, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Pour le champ des catégories. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.categories, "Catégories", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+    </div>
+    <div class="well" style="border-color: rgb(22, 105, 173)">
+    <div class="form-group">
+      <div class="form-inline">
+        {% for cat in formBuilder.categories %}
+          <div class="col-sm-4">  
+            {{ form_label(cat) }}
+            {{ form_widget(cat) }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+
+    {# Pour l'upload de l'image.   #}
+    <div class="form-group">
+      {{ form_label(formBuilder.image.imageFile, "Choisir une image", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="checkbox col-sm-4">
+        {{ form_widget(formBuilder.image.imageFile) }}
+      </div>
+    </div>
+
+    {{ form_widget(formBuilder._token) }}
+    <div class>
+      {# Pour le bouton, pas de label ni d'erreur, on affiche juste le widget #}
+      {{ form_widget(formBuilder.Enregistrer, {'attr': {'class': 'btn btn-primary'}}) }}
+    </div>
+  {{ form_rest(formBuilder) }}
+  </form>
+
+  {# Génération automatique des champs pas encore écrits.
+     Dans cet exemple, ce serait le champ CSRF (géré automatiquement par Symfony !)
+     et tous les champs cachés (type « hidden »). #}
+  
+  {# Fermeture de la balise <form> du formulaire HTML #}
+  {{ form_end(formBuilder) }}
 </div>
+{# src/OC/PlatformBundle/Resources/views/Advert/form.html.twig #}
+
+{# On charge la bibliothèque jQuery. Ici, je la prends depuis le CDN google
+   mais si vous l'avez en local, changez simplement l'adresse. 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    // On récupère la balise <div> en question qui contient l'attribut « data-prototype » qui nous intéresse.
+    var $container = $('div#ozyx_platformbundle_adverttype_categories');
+
+    // On ajoute un lien pour ajouter une nouvelle catégorie
+    var $addLink = $('<a href="#" id="add_category" class="btn btn-default">Ajouter une catégorie</a>');
+    $container.append($addLink);
+
+    // On ajoute un nouveau champ à chaque clic sur le lien d'ajout.
+    $addLink.click(function(e) {
+      addCategory($container);
+      e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+      return false;
+    });
+
+    // On définit un compteur unique pour nommer les champs qu'on va ajouter dynamiquement
+    var index = $container.find(':input').length;
+
+    // On ajoute un premier champ automatiquement s'il n'en existe pas déjà un (cas d'une nouvelle annonce par exemple).
+    if (index == 0) {
+      addCategory($container);
+    } else {
+      // Pour chaque catégorie déjà existante, on ajoute un lien de suppression
+      $container.children('div').each(function() {
+        addDeleteLink($(this));
+      });
+    }
+
+    // La fonction qui ajoute un formulaire Categorie
+    function addCategory($container) {
+      // Dans le contenu de l'attribut « data-prototype », on remplace :
+      // - le texte "__name__label__" qu'il contient par le label du champ
+      // - le texte "__name__" qu'il contient par le numéro du champ
+      var $prototype = $($container.attr('data-prototype').replace(/__name__label__/g, 'Catégorie n°' + (index+1))
+          .replace(/__name__/g, index));
+
+      // On ajoute au prototype un lien pour pouvoir supprimer la catégorie
+      addDeleteLink($prototype);
+
+      // On ajoute le prototype modifié à la fin de la balise <div>
+      $container.append($prototype);
+
+      // Enfin, on incrémente le compteur pour que le prochain ajout se fasse avec un autre numéro
+      index++;
+    }
+
+    // La fonction qui ajoute un lien de suppression d'une catégorie
+    function addDeleteLink($prototype) {
+      // Création du lien
+      $deleteLink = $('<a href="#" class="btn btn-danger">Supprimer</a>');
+
+      // Ajout du lien
+      $prototype.append($deleteLink);
+
+      // Ajout du listener sur le clic du lien
+      $deleteLink.click(function(e) {
+        $prototype.remove();
+        e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+        return false;
+      });
+    }
+  });
+</script>#}

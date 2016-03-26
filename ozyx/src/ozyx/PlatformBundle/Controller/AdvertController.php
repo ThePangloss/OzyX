@@ -7,21 +7,28 @@ namespace ozyx\PlatformBundle\Controller;
 use ozyx\PlatformBundle\Entity\Advert;
 use ozyx\PlatformBundle\Entity\Image;
 use ozyx\PlatformBundle\Entity\Application;
+use ozyx\PlatformBundle\Entity\AdvertSkill;
+use ozyx\PlatformBundle\Form\AdvertType;
+use ozyx\PlatformBundle\Form\AdvertEditType;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+
 class AdvertController extends Controller
 {
 
-  public function menuAction($limit)
+  public function menuAction($limit = 3)
   {
-    // On fixe en dur une liste ici, bien entendu par la suite
-    // on la récupérera depuis la BDD !
-    $listAdverts = array(
-      array('id' => 2, 'title' => 'Recherche développeur Symfony2'),
-      array('id' => 5, 'title' => 'Mission de webmaster'),
-      array('id' => 9, 'title' => 'Offre de stage webdesigner')
+    $listAdverts = $this->getDoctrine()
+      ->getManager()
+      ->getRepository('ozyxPlatformBundle:Advert')
+      ->findBy(
+        array(),                 // Pas de critère
+        array('date' => 'desc'), // On trie par date décroissante
+        $limit,                  // On sélectionne $limit annonces
+        0                        // À partir du premier
     );
 
     return $this->render('ozyxPlatformBundle:Advert:menu.html.twig', array(
@@ -33,38 +40,34 @@ class AdvertController extends Controller
 
   public function indexAction($page)
   {
-    // On ne sait pas combien de pages il y a
-    // Mais on sait qu'une page doit être supérieure ou égale à 1
     if ($page < 1) {
-      // On déclenche une exception NotFoundHttpException, cela va afficher
-      // une page d'erreur 404 (qu'on pourra personnaliser plus tard d'ailleurs)
-      throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
+      throw $this->createNotFoundException("La page ".$page." n'existe pas.");
     }
 
-    // Notre liste d'annonce en dur
-    $listAdverts = array(
-      array(
-        'title'   => 'Recherche développpeur Symfony2',
-        'id'      => 1,
-        'author'  => 'Alexandre',
-        'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-        'date'    => new \Datetime()),
-      array(
-        'title'   => 'Mission de webmaster',
-        'id'      => 2,
-        'author'  => 'Hugo',
-        'content' => 'Nous recherchons un webmaster capable de maintenir notre site internet. Blabla…',
-        'date'    => new \Datetime()),
-      array(
-        'title'   => 'Offre de stage webdesigner',
-        'id'      => 3,
-        'author'  => 'Mathieu',
-        'content' => 'Nous proposons un poste pour webdesigner. Blabla…',
-        'date'    => new \Datetime())
-    );
+    // Ici je fixe le nombre d'annonces par page à 3
+    // Mais bien sûr il faudrait utiliser un paramètre, et y accéder via $this->container->getParameter('nb_per_page')
+    $nbPerPage = 3;
 
+    // Pour récupérer la liste de toutes les annonces : on utilise findAll()
+    $listAdverts = $this->getDoctrine()
+      ->getManager()
+      ->getRepository('ozyxPlatformBundle:Advert')
+      ->getAdverts($page, $nbPerPage)
+    ;
+
+    // On calcule le nombre total de pages grâce au count($listAdverts) qui retourne le nombre total d'annonces
+    $nbPages = ceil(count($listAdverts)/$nbPerPage);
+
+    // Si la page n'existe pas, on retourne une 404
+    if ($page > $nbPages) {
+      throw $this->createNotFoundException("La page ".$page." n'existe pas.");
+    }
+
+    // On donne toutes les informations nécessaires à la vue
     return $this->render('ozyxPlatformBundle:Advert:index.html.twig', array(
-      'listAdverts' => $listAdverts
+      'listAdverts' => $listAdverts,
+      'nbPages'     => $nbPages,
+      'page'        => $page,
     ));
   }
 
@@ -81,81 +84,128 @@ class AdvertController extends Controller
     if (null === $advert) {
       throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
     }
-
     // On récupère la liste des candidatures de cette annonce
     $listApplications = $em
       ->getRepository('ozyxPlatformBundle:Application')
       ->findBy(array('advert' => $advert))
     ;
 
+    // On récupère maintenant la liste des AdvertSkill
+    $listAdvertSkills = $em
+      ->getRepository('ozyxPlatformBundle:AdvertSkill')
+      ->findByAdvert($advert)
+    ;
+
+    //Test d'une var
+    //$path =  'bundles/ozyxplatform/images/'.$advert->getImage()->getImageName();
+
     return $this->render('ozyxPlatformBundle:Advert:view.html.twig', array(
       'advert'           => $advert,
-      'listApplications' => $listApplications
+      'listApplications' => $listApplications,
+      'listAdvertSkills' => $listAdvertSkills
     ));
   }
 
   public function addAction(Request $request)
   {
-    // Création de l'entité Advert
+     // On crée un objet Advert
     $advert = new Advert();
-    $advert->setTitle('Recherche développeur Symfony2.');
-    $advert->setAuthor('Alexandre');
-    $advert->setContent("Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…");
-   
-    // Création d'une première candidature
-    $application1 = new Application();
-    $application1->setAuthor('Marine');
-    $application1->setContent("J'ai toutes les qualités requises.");
 
-    // Création d'une deuxième candidature par exemple
-    $application2 = new Application();
-    $application2->setAuthor('Pierre');
-    $application2->setContent("Je suis très motivé.");
+    $formBuilder = $this->createForm(AdvertType::class, $advert);
 
-    // On lie les candidatures à l'annonce
-    $application1->setAdvert($advert);
-    $application2->setAdvert($advert);
+    $ipClient = $this->container->get('request_stack')->getCurrentRequest()->getClientIp();
 
-    // Création de l'entité Image
-    $image = new Image();
-    $image->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg');
-    $image->setAlt('Job de rêve');
+    if (($formBuilder->handleRequest($request)->isValid()) && !empty($ipClient))  {
+  
+      $advert->setDate(new \Datetime());
+      $advert->setIp($ipClient);
 
-    // On lie l'image à l'annonce
-    $advert->setImage($image);
-
-    // On récupère l'EntityManager
-    $em = $this->getDoctrine()->getManager();
-
-    // Étape 1 : On « persiste » l'entité
-    $em->persist($advert);
-    $em->persist($application1);
-    $em->persist($application1);
-
-    // Étape 2 : On déclenche l'enregistrement
-    $em->flush();
-
-    // Reste de la méthode qu'on avait déjà écrit
-    if ($request->isMethod('POST')) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($advert);
+      $em->flush();
+            
       $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
+
+    /*
+    return $this->render('ozyxPlatformBundle:Advert:add.html.twig', array(
+      'formBuilder' => $formBuilder->createView(),
+      'test'        => $test
+    ));
+    */
       return $this->redirect($this->generateUrl('ozyx_platform_view', array('id' => $advert->getId())));
     }
 
-    return $this->render('ozyxPlatformBundle:Advert:add.html.twig');
+    // On passe la méthode createView() du formulaire à la vue
+    // afin qu'elle puisse afficher le formulaire toute seule
+    return $this->render('ozyxPlatformBundle:Advert:add.html.twig', array(
+      'formBuilder' => $formBuilder->createView()/*,
+      'isFlood'     => $isFlood*/
+    ));
   }
 
   public function editAction($id, Request $request)
   {
-    $advert = array(
-      'title'   => 'Recherche développpeur Symfony2',
-      'id'      => $id,
-      'author'  => 'Alexandre',
-      'content' => 'Nous recherchons un développeur Symfony2 débutant sur Lyon. Blabla…',
-      'date'    => new \Datetime()
-    );
+    $em = $this->getDoctrine()->getManager();
+    // On récupère l'annonce $id
+    $advert = $em->getRepository('ozyxPlatformBundle:Advert')->find($id);
 
+    if (null === $advert) {
+      throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+    }
+
+    $formBuilder = $this->createForm(AdvertEditType::class, $advert);
+
+    $ipClient = $this->container->get('request_stack')->getCurrentRequest()->getClientIp();
+
+    if ($formBuilder->handleRequest($request)->isValid()) {
+    /*
+   
+      $path =  'ozyx/src/ozyx/PlatformBundle/Resources/public/images'.$advert->getImage()->getImageCachePath();
+      //__DIR__.'/../../../../web/'.
+
+      $filter           = 'cache';
+      $filterStrip      = 'stripImage';
+      $filterMiniature  = 'miniature';
+
+      //A tester
+      $cacheManager = $this->get('liip_imagine.cache.manager');
+      $srcPath = $cacheManager->getBrowserPath($path, $filterStrip);
+      $cacheManager->resolve($this->container->get('request_stack')->getCurrentRequest(), $path, $filterStrip);
+      $cacheManager->remove($srcPath, $filterStrip);
+      //
+   $cacheManager = $this->container->get('liip_imagine.cache.manager');
+      // Remove the cached image corresponding to that path & filter, if it is stored
+      if ($cacheManager->isStored($path, $filter)) {
+          $this->$cacheManager->remove($path, $filter);
+      }    
+      if ($cacheManager->isStored($path, $filterStrip)) {
+          $this->$cacheManager->remove($path, $filterStrip);
+      }     
+      if ($cacheManager->isStored($path, $filterMiniature)) {
+          $this->$cacheManager->remove($path, $filterMiniature);
+      }
+      */
+
+      $advert->setIp($ipClient);
+      $advert->setUpdatedAt(new \Datetime());
+
+      $em = $this->getDoctrine()->getManager();
+      $em->flush();
+      
+      //ATTENTION ! Efface la nouvelle image et pas l'ancienne => Trouver comment récupérer le nom de l'ancienne image...
+      //$path =  $advert->getImage()->getImageCachePath();
+      //unlink('ozyx/web/media/cache/stripImage/'.$path);
+
+      $request->getSession()->getFlashBag()->add('notice', 'Annonce bien modifiée.');
+
+      return $this->redirect($this->generateUrl('ozyx_platform_view', array('id' => $advert->getId())));
+    }
+
+    // On passe la méthode createView() du formulaire à la vue
+    // afin qu'elle puisse afficher le formulaire toute seule
     return $this->render('ozyxPlatformBundle:Advert:edit.html.twig', array(
-      'advert' => $advert
+      'advert'      => $advert,
+      'formBuilder' => $formBuilder->createView(),
     ));
   }
 
@@ -168,10 +218,6 @@ class AdvertController extends Controller
 
     // On modifie l'URL de l'image par exemple
     $advert->getImage()->setUrl('test.png');
-
-    // On n'a pas besoin de persister l'annonce ni l'image.
-    // Rappelez-vous, ces entités sont automatiquement persistées car
-    // on les a récupérées depuis Doctrine lui-même
     
     // On déclenche la modification
     $em->flush();
@@ -179,14 +225,36 @@ class AdvertController extends Controller
     return new Response('OK');
   }
 
-  public function deleteAction($id)
+  public function deleteAction($id, Request $request)
   {
-    // Ici, on récupérera l'annonce correspondant à $id
+    $em = $this->getDoctrine()->getManager();
 
-    // Ici, on gérera la suppression de l'annonce en question
+    // On récupère l'annonce $id
+    $advert = $em
+      ->getRepository('ozyxPlatformBundle:Advert')
+      ->find($id)
+    ;
 
+    if (null === $advert) {
+      throw new NotFoundHttpException("L'annonce d'id ".$id." n'existe pas.");
+    }
+
+    // On crée un formulaire vide, qui ne contiendra que le champ CSRF
+    // Cela permet de protéger la suppression d'annonce contre cette faille
+    $form = $this->createFormBuilder()->getForm();
+
+    if ($form->handleRequest($request)->isValid()) {
+
+      $em->remove($advert);
+      $em->flush();
+      $request->getSession()->getFlashBag()->add('info', "L'annonce a bien été supprimée.");
+      return $this->redirect($this->generateUrl('ozyx_platform_home'));
+    }
+
+    // Si la requête est en GET, on affiche une page de confirmation avant de delete
     return $this->render('ozyxPlatformBundle:Advert:delete.html.twig', array(
-      'id' => $id
+      'advert' => $advert,
+      'form'   => $form->createView()
     ));
   }
 }

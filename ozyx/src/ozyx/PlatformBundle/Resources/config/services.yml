@@ -3,3 +3,22 @@ services:
     ozyx_platform.antispam:
         class: ozyx\PlatformBundle\Antispam\ozyxAntispam
         arguments: ['@mailer', %locale%, 50]
+
+    ozyx_platform.doctrine.notification:
+        class: ozyx\PlatformBundle\DoctrineListener\ApplicationNotification
+        arguments: ['@mailer']
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+
+    ozyx_platform.listener:
+        class: ozyx\PlatformBundle\DoctrineListener\ozyxVideCacheImagine
+        arguments: ["@liip_imagine.cache.manager", '@request_stack']
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: preRemove }
+
+    ozyx_platform.validator.antiflood:
+        class: ozyx\PlatformBundle\Validator\AntifloodValidator
+        arguments: ['@request_stack', '@doctrine.orm.entity_manager']
+        tags:
+            - { name: validator.constraint_validator, alias: ozyx_platform_antiflood }

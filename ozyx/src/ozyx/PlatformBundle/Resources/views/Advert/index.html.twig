@@ -7,21 +7,53 @@
 {% endblock %}
 
 {% block ozyxplatform_body %}
-
   <h2>Liste des annonces</h2>
-
-  <ul>
-    {% for advert in listAdverts %}
-      <li>
-        <a href="{{ path('ozyx_platform_view', {'id': advert.id}) }}">
-          {{ advert.title }}
-        </a>
-        par {{ advert.author }},
-        le {{ advert.date|date('d/m/Y') }}
+  <ul class="pagination">
+    {# On utilise la fonction range(a, b) qui crée un tableau de valeurs entre a et b #}
+    {% for p in range(1, nbPages) %}
+      <li{% if p == page %} class="active"{% endif %}>
+        <a href="{{ path('ozyx_platform_home', {'page': p}) }}">{{ p }}</a>
       </li>
-    {% else %}
-      <li>Pas (encore !) d'annonces</li>
     {% endfor %}
   </ul>
+    {% for advert in listAdverts %}   
+        <div class="well">
+          {# On vérifie qu'une image soit bien associée à l'annonce #}
+          {% if  (advert.image is not null) and (advert.image.ImageCachePath is not empty) %}
+            <img src="{{  advert.image.ImageCachePath|imagine_filter('miniature') }}" alt=" {{  advert.image.ImageCachePath }}" />
+          {% endif %}
 
+          <a href="{{ path('ozyx_platform_view', {'id': advert.id}) }}">
+            {{ advert.title }}
+          </a>
+          par {{ advert.author }},
+          le {{ advert.date|date('d/m/Y') }}
+
+          <b><br/>Compétences nécessaires:</b>  
+          {% if advert.advertSkills is empty %}
+            Aucunes compétences requises.
+          {% else %}
+            {% for skill in advert.advertSkills %}
+              {{ skill.skill.name }}{% if not loop.last %}, {% else %}. {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          <b><br/>Candidatures:</b>
+          {% if advert.applications is empty %}
+            Aucune candidature.
+          {% else %}
+            {% for app in advert.applications %}
+              {{ app.author }}{% if not loop.last %}, {% else %}. {% endif %}
+            {% endfor %}
+          {% endif %}
+          <a href="{{ path('ozyx_platform_delete', {'id': advert.id}) }}" class="btn btn-danger col-md-offset-5">
+            <i class="glyphicon glyphicon-trash"></i>
+          Supprimer l'annonce
+          </a>
+        </div>
+  {% else %}
+    <div class="well">
+      Pas d'annonces
+     </div>
+  {% endfor %}
 {% endblock %}

@@ -1,14 +1,28 @@
-{# src/ozyx/PlatformBundle/Resources/view/Advert/view.html.twig #}
+{# src/ozyx/PlatformBundle/Resources/view/Advert/delte.html.twig #}
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Bienvenue sur la page de suppression d'une annonce!</title>
-  </head>
-  <body>
-    <h1>Suppression d'une annonce</h1>
-    <p>
-      Ici nous pourrons supprimer l'annonce ayant comme id : {{ id }}<br />
-    </p>
-  </body>
-</html>
+{% extends "ozyxPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+  Supprimer une annonce - {{ parent() }}
+{% endblock %}
+
+{% block ozyxplatform_body %}
+
+  <h2>Supprimer une annonce</h2>
+  <p>
+    Etes-vous certain de vouloir supprimer l'annonce "{{ advert.title }}" ?
+  </p>
+
+  {# On met l'id de l'annonce dans la route de l'action du formulaire #}
+  <form action="{{ path('ozyx_platform_delete', {'id': advert.id}) }}" method="post">
+    <a href="{{ path('ozyx_platform_view', {'id': advert.id}) }}" class="btn btn-default">
+      <i class="glyphicon glyphicon-chevron-left"></i>
+      Retour à l'annonce
+    </a>
+    {# Ici j'ai écrit le bouton de soumission à la main #}
+    <input type="submit" value="Supprimer" class="btn btn-danger" />
+    {# Ceci va générer le champ CSRF #}
+    {{ form_rest(form) }}
+  </form>
+
+{% endblock %}

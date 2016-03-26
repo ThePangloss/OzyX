@@ -7,21 +7,39 @@
 {% endblock %}
 
 {% block ozyxplatform_body %}
-
   <h2>Modifier une annonce</h2>
-
-  {{ include("ozyxPlatformBundle:Advert:form.html.twig") }}
-
+    <div class="well">
+      <div class="row">
+        <div class="col-sm-8">
+          {# On vérifie qu'une image soit bien associée à l'annonce #}
+          {% if  (advert.image is not null) and (advert.image.ImageCachePath is not empty) %}
+            <img src="{{ advert.image.ImageCachePath|imagine_filter('stripImage') }}" alt=" {{ advert.image.ImageCachePath }}" />
+          {% endif %}
+        </div>
+        <div class="col-sm-4">
+          <p>
+            Date d'enregistrement:</br>
+            {{ advert.date|date('d-m-Y') }}
+          </p>
+          <p>
+            Derniere modification(s):</br>
+            {{ advert.updatedAt|date('d-m-Y \à H:i:s') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  <br/>
   <p>
-    Vous éditez une annonce déjà existante, merci de ne pas changer
-    l'esprit générale de l'annonce déjà publiée.
+    <em>
+      Vous éditez une annonce déjà existante, merci de ne pas changer
+      l'esprit générale de l'annonce déjà publiée.
+    </em>
   </p>
-
   <p>
     <a href="{{ path('ozyx_platform_view', {'id': advert.id}) }}" class="btn btn-default">
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour à l'annonce
     </a>
   </p>
-
+  {{ include("ozyxPlatformBundle:Advert:form.html.twig") }}
 {% endblock %}

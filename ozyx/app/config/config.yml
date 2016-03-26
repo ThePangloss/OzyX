@@ -70,3 +70,60 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+# Stof\DoctrineExtensionsBundle configuration
+stof_doctrine_extensions:
+    orm:
+        default:
+            sluggable: true
+
+#Configuration de la bibliothèque pour manipuler les images
+liip_imagine:
+
+    resolvers:
+        default:
+            web_path:
+                web_root: C:\wamp\www\ozyx\web
+                cache_prefix: media/cache
+
+    loaders:
+        default:
+            filesystem:
+                data_root: C:\wamp\www\ozyx\web\bundles\ozyxplatform\images
+
+    driver:               gd
+    cache:                default
+    data_loader:          default
+    default_image:        null
+    controller:
+        filter_action:         liip_imagine.controller:filterAction
+        filter_runtime_action: liip_imagine.controller:filterRuntimeAction
+
+    filter_sets:
+        cache: ~
+        miniature:
+            quality: 75
+            filters:
+                thumbnail: { size: [120, 90], mode: outbound }
+        stripImage:
+            filters:
+                strip: ~
+                relative_resize: { heighten: 250 }
+
+assetic:
+    debug:          '%kernel.debug%'
+    use_controller: '%kernel.debug%'
+    filters:
+        cssrewrite: ~
+
+vich_uploader:
+    db_driver: orm # or mongodb or propel or phpcr
+
+    mappings:
+        product_image:
+            uri_prefix:         /images
+            upload_destination: %kernel.root_dir%/../web/bundles/ozyxplatform/images
+
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true

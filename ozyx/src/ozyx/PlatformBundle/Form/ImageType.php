@@ -1,0 +1,38 @@
+<?php
+// src/OC/PlatformBundle/Form/ImageType.php
+
+namespace ozyx\PlatformBundle\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+
+class ImageType extends AbstractType
+{
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('imageFile', FileType::class)
+        ;
+    }
+    
+    /**
+    * @param OptionsResolver $resolver
+    */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'ozyx\PlatformBundle\Entity\Image'
+        ));
+    }
+
+    public function getName()
+    {
+        return 'ozyx_platformbundle_image';
+    }
+}

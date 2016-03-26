@@ -2,6 +2,8 @@
 
 namespace ozyx\PlatformBundle\Entity;
 
+use Doctrine\ORM\EntityRepository;
+
 /**
  * ApplicationRepository
  *

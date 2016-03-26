@@ -3,16 +3,19 @@
 
 namespace ozyx\PlatformBundle\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="ozyx\PlatformBundle\Entity\ApplicationRepository")
+  * @ORM\HasLifecycleCallbacks()
  */
 class Application
 {
 
   /**
-   * @ORM\ManyToOne(targetEntity="ozyx\PlatformBundle\Entity\Advert")
+   * @ORM\ManyToOne(targetEntity="ozyx\PlatformBundle\Entity\Advert", inversedBy="applications")
    * @ORM\JoinColumn(nullable=false)
    */
   private $advert;
@@ -107,5 +110,21 @@ class Application
     public function getAdvert()
     {
         return $this->advert;
+    }
+
+    /**
+    * @ORM\PrePersist
+    */
+    public function increase()
+    {
+      $this->getAdvert()->increaseApplication();
+    }
+
+    /**
+    * @ORM\PreRemove
+    */
+    public function decrease()
+    {
+      $this->getAdvert()->decreaseApplication();
     }
 }

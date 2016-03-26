@@ -1,4 +1,4 @@
-{# src/ozyx/PlatformBundle/Resources/views/Advert/edit.html.twig #}
+{# src/ozyx/PlatformBundle/Resources/views/Advert/add.html.twig #}
 
 {% extends "ozyxPlatformBundle::layout.html.twig" %}
 
@@ -7,16 +7,13 @@
 {% endblock %}
 
 {% block ozyxplatform_body %}
-
   <h2>Ajouter une annonce</h2>
 
   {{ include("ozyxPlatformBundle:Advert:form.html.twig") }}
-
   <p>
     <a href="{{ path('ozyx_platform_home')}}" class="btn btn-default">
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour
     </a>
   </p>
-
 {% endblock %}

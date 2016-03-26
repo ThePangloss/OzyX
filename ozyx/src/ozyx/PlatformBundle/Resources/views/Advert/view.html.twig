@@ -8,19 +8,58 @@
 
 {% block ozyxplatform_body %}
 
-  {# On vérifie qu'une image soit bien associée à l'annonce #}
-  {% if advert.image is not null %}
-    <img src="{{ advert.image.url }}" alt="{{ advert.image.alt }}">
+  {% if app.request.hasPreviousSession %}
+      {% for flashMessage in app.session.flashbag.get('notice') %}
+          <div class="flash-notice">
+              {{ flashMessage }}
+          </div>
+      {% endfor %}
   {% endif %}
-  
-  <h2>{{ advert.title }}</h2>
-  <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i>
 
-  <h2>Candidature en cours: </h2>
-  <i>{{ advert.title }}</i>
+  {# On vérifie qu'une image soit bien associée à l'annonce #}
+  {% if  (advert.image is not null) and (advert.image.ImageCachePath is not empty) %}
+    <img src="{{ advert.image.ImageCachePath|imagine_filter('stripImage') }}" alt=" {{ advert.image.ImageCachePath }}" />
+  {% endif %}
+    <h2>{{ advert.title }}</h2>
 
+
+
+  <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i></br>
   <div class="well">
-    {{ listApplications.author }}
+  	<i><b>Contenu de l'annonce: </b></i></br>
+  	<i>{{ advert.content }}</i>
+  </div>
+
+  {% if not advert.categories.empty %}
+  <p>
+    Cette annonce est parue dans les catégories suivantes :</br>
+    {% for category in advert.categories %}
+      {{ category.name }}{% if not loop.last %}, {% else %}. {% endif %}
+    {% endfor %}
+  </p>
+  {% else %}
+  <p>
+  	<em>Aucune catégorie pour le moment.</em>
+  </p>
+  {% endif %}
+
+  {% if listAdvertSkills|length > 0 %}
+  <div>
+    <b>Cette annonce requiert les compétences suivantes :</b>
+    <ul>
+      {% for advertSkill in listAdvertSkills %}
+        <li>{{ advertSkill.skill.name }} : niveau {{ advertSkill.level }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <h3>Personne ayant postulées à l'offre:</h3>
+  <div class="well">
+
+  {% for listApplications in listApplications %}
+    {{ listApplications.author }}</br>
+  {% endfor %} 
   </div>
 
   <p>
