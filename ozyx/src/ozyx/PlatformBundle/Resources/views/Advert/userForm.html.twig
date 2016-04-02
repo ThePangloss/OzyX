@@ -1,0 +1,71 @@
+{# src/ozyx/PlatformBundle/Resources/views/Advert/userForm.html.twig #}
+
+<div class="well">
+  {{ form_start(formBuilder, {'attr': {'class': 'form-horizontal'}}) }}
+{% set divError = 'd' %}
+{% for field in formBuilder %}
+  {% if field.vars.errors is defined %}
+    {% if (field.vars.errors)|length > 0 %}     
+      {% set divError = 'divError' %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+    {% if divError == 'divError'  %}
+      <div class="well"  style="border-color: red; background-color: rgb(255, 68, 68); color: rgb(255,255,255); font-weight: bold; text-shadow: 2px 2px 1px #000;">  
+          {# Les erreurs générales du formulaire. #}
+          {{ form_errors(formBuilder) }}
+          {{ form_errors(formBuilder.user) }}
+          {{ form_errors(formBuilder.password) }}
+          {{ form_errors(formBuilder.email) }}
+          {{ form_errors(formBuilder.roles) }}
+      </div>
+    {% endif %}
+
+    {# Champ du nom de l'utilisateur. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.user, "Nom d'utilisateur", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.user, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ du mot de passe. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.password, "Mot de passe", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.password, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ d'email. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.email, "E-mail", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="checkbox col-sm-4">
+        {{ form_widget(formBuilder.email, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {# Champ du nom de roles. #}
+    <div class="form-group">
+      {{ form_label(formBuilder.roles, "Roles", {'label_attr': {'class': 'col-sm-3 control-label'}}) }}
+      <div class="col-sm-4">
+        {{ form_widget(formBuilder.roles, {'attr': {'class': 'form-control'}}) }}
+      </div>
+    </div>
+
+    {{ form_widget(formBuilder._token) }}
+    <div class>
+      {# Pour le bouton, pas de label ni d'erreur, on affiche juste le widget #}
+      {{ form_widget(formBuilder.Enregistrer, {'attr': {'class': 'btn btn-primary'}}) }}
+    </div>
+  {{ form_rest(formBuilder) }}
+  </form>
+
+  {# Génération automatique des champs pas encore écrits.
+     Dans cet exemple, ce serait le champ CSRF (géré automatiquement par Symfony !)
+     et tous les champs cachés (type « hidden »). #}
+  
+  {# Fermeture de la balise <form> du formulaire HTML #}
+  {{ form_end(formBuilder) }}
+</div>

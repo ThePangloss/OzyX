@@ -1,0 +1,30 @@
+{# src/ozyx/PlatformBundle/Resources/views/Advert/userEdit.html.twig #}
+
+{% extends "ozyxPlatformBundle::layout.html.twig" %}
+
+{% block title %}
+  Modifier un utilisateur
+  {# - {{ parent() }} #}
+{% endblock %}
+
+{% block ozyxplatform_body %}
+  <h2>Modifier un utilisateur</h2>
+  {% if app.request.hasPreviousSession %}
+      {% for flashMessage in app.session.flashbag.get('notice') %}
+          <div class="flash-notice">
+              {{ flashMessage }}
+          </div>
+      {% endfor %}
+  {% endif %}
+  <p>
+    <a href="{{ path('ozyx_platform_home') }}" class="btn btn-default">
+      <i class="glyphicon glyphicon-chevron-left"></i>
+      Retour à l'accueil
+    </a>
+  </p>
+
+  {{ include("ozyxPlatformBundle:Advert:userForm.html.twig") }}
+  {#    POUR PASSER UNE VARIABLE AU FORM:
+     {% include"ozyxPlatformBundle:Advert:userForm.html.twig" with {'users':users} %}
+  #}
+{% endblock %}

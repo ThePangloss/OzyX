@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Filesystem\Filesystem;
 //use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -30,6 +31,13 @@ class Image
      * @var string
      */
     private $imageName;
+
+    /**
+     * @ORM\Column(name="oldImageName", type="string", length=255,  nullable=true)
+     *
+     * @var string
+     */
+    private $oldImageName;
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
@@ -130,6 +138,30 @@ class Image
     }
 
     /**
+     * Set oldImageName
+     *
+     * @param string $oldImageName
+     *
+     * @return Image
+     */
+    public function setOldImageName($oldImageName)
+    {
+        $this->oldImageName = $oldImageName;
+
+        return $this;
+    }
+
+    /**
+     * Get oldImageName
+     *
+     * @return string
+     */
+    public function getOldImageName()
+    {
+        return $this->oldImageName;
+    }
+
+    /**
      * Get imageName
      *
      * @return string
@@ -139,11 +171,53 @@ class Image
         return $this->imageName;
     }
 
+    /**
+     * Get getImageCachePath
+     *
+     * @return string
+     */
     public function getImageCachePath()
     {
-    // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
-    return $this->getImageName();
+        // On retourne le chemin relatif vers l'image pour un navigateur (relatif au répertoire /web donc)
+        return $this->getImageName();
 
-    //__DIR__.'/../../../../web/'.'bundles/ozyxplatform/images/'.
+        //__DIR__.'/../../../../web/'.'bundles/ozyxplatform/images/'.
+    }
+
+
+    /**
+     * Get GetOldCacheStrip
+     *
+     * @return string
+     */
+    public function GetOldCacheStrip()
+    {    
+        $fs = new Filesystem();
+        $cacheRepStrip = '';
+
+        $cacheRepStrip = __DIR__.'/../../../../web/'.'media/cache/stripImage/'.$this->getoldImageName();
+        if (($fs->exists($cacheRepStrip))) {
+            return $cacheRepStrip;
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
+     * Get GetOldCacheMiniat
+     *
+     * @return string
+     */
+    public function GetOldCacheMiniat()
+    {    
+        $fs = new Filesystem();
+
+        $cacheRepMiniat = __DIR__.'/../../../../web/'.'media/cache/miniature/'.$this->getoldImageName();
+        if ($fs->exists($cacheRepMiniat)){
+            return $cacheRepMiniat;
+        } else {
+            return false;
+        }
     }
 }

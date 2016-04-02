@@ -5,9 +5,10 @@
 {% block title %}
   Accueil - {{ parent() }}
 {% endblock %}
-
 {% block ozyxplatform_body %}
-  <h2>Liste des annonces</h2>
+{{ checkIfSpam("cffkkk") }}
+
+  <h3>Liste des annonces</h3>
   <ul class="pagination">
     {# On utilise la fonction range(a, b) qui crée un tableau de valeurs entre a et b #}
     {% for p in range(1, nbPages) %}
@@ -23,7 +24,7 @@
             <img src="{{  advert.image.ImageCachePath|imagine_filter('miniature') }}" alt=" {{  advert.image.ImageCachePath }}" />
           {% endif %}
 
-          <a href="{{ path('ozyx_platform_view', {'id': advert.id}) }}">
+          <a href="{{ path('ozyx_platform_view', {'advert_id': advert.id}) }}">
             {{ advert.title }}
           </a>
           par {{ advert.author }},
@@ -46,10 +47,22 @@
               {{ app.author }}{% if not loop.last %}, {% else %}. {% endif %}
             {% endfor %}
           {% endif %}
-          <a href="{{ path('ozyx_platform_delete', {'id': advert.id}) }}" class="btn btn-danger col-md-offset-5">
-            <i class="glyphicon glyphicon-trash"></i>
-          Supprimer l'annonce
-          </a>
+          <div class="row">
+            {% if is_granted('ROLE_AUTEUR') %}
+              <div class="col-xs-3 col-md-offset-6" style="padding-right: 0px; margin-right: 0px">
+                <a href="{{ path('ozyx_platform_edit', {'advert_id': advert.id}) }}" class="btn btn-default" >
+                  <i class="glyphicon glyphicon-edit"></i>
+                  Modifier l'annonce
+                </a>
+              </div>
+              <div class="col-xs-3" style="padding-left: 0px; margin-left: 0px">
+                <a href="{{ path('ozyx_platform_delete', {'advert_id': advert.id}) }}" class="btn btn-danger">
+                  <i class="glyphicon glyphicon-trash"></i>
+                  Supprimer l'annonce
+                </a>
+              </div>
+            {% endif %}
+          </div>
         </div>
   {% else %}
     <div class="well">

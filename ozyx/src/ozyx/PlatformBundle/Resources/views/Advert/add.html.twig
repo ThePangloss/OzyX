@@ -5,12 +5,17 @@
 {% block title %}
   Ajouter une annonce - {{ parent() }}
 {% endblock %}
-
 {% block ozyxplatform_body %}
   <h2>Ajouter une annonce</h2>
-
   {{ include("ozyxPlatformBundle:Advert:form.html.twig") }}
   <p>
+
+	  {% if idAdvert is defined %}
+	  	 l'idEstElleSet?: {{ dump(idAdvert) }}
+	  {% else %}
+	  	idNestPasSet
+	  {% endif %}
+  
     <a href="{{ path('ozyx_platform_home')}}" class="btn btn-default">
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour

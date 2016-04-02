@@ -7,6 +7,11 @@
 {% endblock %}
 
 {% block ozyxplatform_body %}
+{#
+{% if  (advert.image.oldImage is not null) and (advert.image.oldImage is not empty) %}
+  Path : {{  dump(oldImage) }}
+{% endif %}
+#}
 
   {% if app.request.hasPreviousSession %}
       {% for flashMessage in app.session.flashbag.get('notice') %}
@@ -22,12 +27,11 @@
   {% endif %}
     <h2>{{ advert.title }}</h2>
 
-
-
   <i>Par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}</i></br>
+  
   <div class="well">
   	<i><b>Contenu de l'annonce: </b></i></br>
-  	<i>{{ advert.content }}</i>
+  	<i>{{ advertDcd|raw }}</i>
   </div>
 
   {% if not advert.categories.empty %}
@@ -67,14 +71,16 @@
       <i class="glyphicon glyphicon-chevron-left"></i>
       Retour à la liste
     </a>
-    <a href="{{ path('ozyx_platform_edit', {'id': advert.id}) }}" class="btn btn-default">
-      <i class="glyphicon glyphicon-edit"></i>
-      Modifier l'annonce
-    </a>
-    <a href="{{ path('ozyx_platform_delete', {'id': advert.id}) }}" class="btn btn-danger">
-      <i class="glyphicon glyphicon-trash"></i>
-      Supprimer l'annonce
-    </a>
+    {% if is_granted('ROLE_AUTEUR') %}
+      <a href="{{ path('ozyx_platform_edit', {'advert_id': advert.id}) }}" class="btn btn-default">
+        <i class="glyphicon glyphicon-edit"></i>
+        Modifier l'annonce
+      </a>
+      <a href="{{ path('ozyx_platform_delete', {'advert_id': advert.id}) }}" class="btn btn-danger">
+        <i class="glyphicon glyphicon-trash"></i>
+        Supprimer l'annonce
+      </a>
+    {% endif %}
   </p>
 
 {% endblock %}

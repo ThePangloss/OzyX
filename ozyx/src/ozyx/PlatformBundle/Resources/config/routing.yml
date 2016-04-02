@@ -7,7 +7,7 @@ ozyx_platform_home:
         page: \d*
 
 ozyx_platform_view:
-    path:      /advert/{id}
+    path:      /advert/{advert_id}
     defaults:  { _controller: ozyxPlatformBundle:Advert:view }
     requirements:
         id: \d+
@@ -17,13 +17,17 @@ ozyx_platform_add:
     defaults:  { _controller: ozyxPlatformBundle:Advert:add }
 
 ozyx_platform_edit:
-    path:      /edit/{id}
+    path:      /edit/{advert_id}
     defaults:  { _controller: ozyxPlatformBundle:Advert:edit }
     requirements:
         id: \d+
 
 ozyx_platform_delete:
-    path:      /delete/{id}
+    path:      /delete/{advert_id}
     defaults:  { _controller: ozyxPlatformBundle:Advert:delete }
     requirements:
         id: \d+
+
+ozyx_platform_editUser:
+    path:      /editUser
+    defaults:  { _controller: ozyxPlatformBundle:Advert:editUser }

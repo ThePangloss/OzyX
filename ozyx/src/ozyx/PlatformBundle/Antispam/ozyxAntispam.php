@@ -3,19 +3,25 @@
 
 namespace ozyx\PlatformBundle\Antispam;
 
-class ozyxAntispam
+class ozyxAntispam extends \Twig_Extension
 {
-  private $mailer;
-  private $locale;
-  private $minLength;
+  protected   $mailer;
+  protected   $locale;
+  protected   $minLength;
 
-  public function __construct(\Swift_Mailer $mailer, $locale, $minLength)
+  public function __construct(\Swift_Mailer $mailer, $minLength)
   {
     $this->mailer    = $mailer;
-    $this->locale    = $locale;
     $this->minLength = (int) $minLength;
   }
 
+  // Twig va exécuter cette méthode pour savoir quelle(s) fonction(s) ajoute notre service
+  public function getFunctions()
+  {
+    return array(
+      'checkIfSpam' => new \Twig_Function_Method($this, 'isSpam')
+    );
+  }
   /**
    * Vérifie si le texte est un spam ou non
    *
@@ -24,6 +30,22 @@ class ozyxAntispam
    */
   public function isSpam($text)
   {
-    return strlen($text) < $this->minLength;
+    $this->minLength = 3;
+    if ((strlen($text)) < ($this->minLength)) {
+      return true;
+    }else{
+      return false;
+    }  
+  }
+
+  // La méthode getName() identifie votre extension Twig, elle est obligatoire
+  public function getName()
+  {
+    return 'ozyxAntispam';
+  }
+
+  public function setLocale($locale)
+  {
+    $this->locale = $locale;
   }
 }

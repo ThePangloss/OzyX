@@ -106,8 +106,6 @@ class Advert
      */
     private $author;
 
-    
-
     /**
      * @var string
      *
@@ -490,5 +488,15 @@ class Advert
     public function getIp()
     {
         return $this->ip;
+    }
+
+    /**
+     * Get imageCache
+     *
+     * @return string
+     */
+    public function imageCache()
+    {
+        return $this->getImage()->GetOldCacheStrip();
     }
 }

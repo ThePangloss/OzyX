@@ -41,7 +41,12 @@
         "jms/metadata": "^1.5",
         "symfony/property-access": "^3.0",
         "ocramius/proxy-manager": "^1.0",
-        "symfony/framework-bundle": "^3.0"
+        "symfony/framework-bundle": "^3.0",
+        "friendsofsymfony/user-bundle": "~2.0@dev",
+        "egeloen/ckeditor-bundle": "^4.0",
+        "coresphere/console-bundle": "^0.4.0",
+        "components/jquery": "^2.2",
+        "twbs/bootstrap": "^3.3"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

@@ -5,58 +5,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>{% block title %}ozyx Plateforme{% endblock %}</title>
-
+  {#
   {% block stylesheets %}
-    {# On charge le CSS de bootstrap depuis le site directement #}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   {% endblock %}
+  #}{#filter='?uglifycss#}
+  {% block stylesheets %}
+    {% stylesheets filter='cssrewrite' 
+      'css/bootstrap.css'
+      'css/bootstrap-theme.css'
+      '@ozyxPlatformBundle/Resources/public/css/*'%}
+      <link rel="stylesheet" href="{{ asset_url }}" type="text/css" />
+    {% endstylesheets %}
+  {% endblock %}
 </head>
-
 <body>
-  <div class="container">
-    <div id="header" class="jumbotron">
-      <h1>Ma plateforme d'annonces</h1>
-      <p>
-        Ce projet est propulsé par Symfony2,
-        et construit grâce au MOOC OpenClassrooms et SensioLabs.
-      </p>
-      <p>
-        <a class="btn btn-primary btn-lg" href="http://fr.openclassrooms.com/informatique/cours/developpez-votre-site-web-avec-le-framework-symfony2">
-          Participer au MOOC »
-        </a>
-      </p>
+  <div id="header" class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="padding-bottom: 15px;">
+      <div class="pull-right">
+        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            <div class="text-info" style="margin-right: 10px; padding-right: 10px;"> Bonjour ! Connecté en tant que <strong> {{ app.user.username }} </strong> </div>
+            <a class="btn btn-primary" href="{{ path('fos_user_security_logout') }}">Déconnexion</a>
+        {% else %}
+            <a class="btn btn-info" href="{{ path('fos_user_registration_register') }}">S'inscrire</a>
+            <a class="btn btn-primary" href="{{ path('fos_user_security_login') }}">Connexion</a>
+            <div class="text-warning">
+              Vous n'êtes pas encore authentifié.
+            </div>
+        {% endif %}
+        {% if is_granted("ROLE_SUPER_ADMIN") %}
+            <a class="btn btn-warning" href="{{ path('ozyx_platform_editUser') }}">Gérer un utilisateur</a>
+        {% endif %}
+      </div>
+    </nav>
+    <div class="jumbotron" style="margin-bottom: 0px; padding-bottom: 15px; margin-top: 15px; padding-top: 40px;">
+      <h1 style="font-size: 45px">Plateforme d'annonces</h1>
+      Nous sommes le {{ 'now'|localizeddate('full', 'none') }} et il est {{ 'now'|localizeddate('none', 'short') }}
     </div>
-
     <div class="row">
       <div id="menu" class="col-md-3">
         <h3>Les annonces</h3>
         <ul class="nav nav-pills nav-stacked">
           <li><a href="{{ path('ozyx_platform_home') }}">Accueil</a></li>
-          <li><a href="{{ path('ozyx_platform_add') }}">Ajouter une annonce</a></li>
+          {% if is_granted('ROLE_AUTEUR') %}
+            <li><a href="{{ path('ozyx_platform_add') }}">Ajouter une annonce</a></li>
+          {% endif %}
         </ul>
-
         <h4>Dernières annonces</h4>
         {{ render(controller("ozyxPlatformBundle:Advert:menu", {'limit': 3})) }}
       </div>
-      <div id="content" class="col-md-9">
+      <div id="content" class="col-md-9" style="margin-bottom: 0px; padding-bottom: 15px; margin-top: 0px; padding-top: 0px;">
         {% block body %}
         {% endblock %}
       </div>
     </div>
-
-    <hr>
-      <footer>
-        <div id="menu" class="col-md-12"> The sky's the limit © {{ 'now'|date('Y') }} and beyond. <div class="pull-right"> Responsable du site: {{ webmaster }} </div></div>
-      </footer>
+    <footer>
+      <div class="well">
+        <nav class="navbar navbar-inverse navbar-fixed-bottom">
+          <div style="color: #FFFFFF; padding-right:40px;  padding-left:40px;">
+             OzyX Corp © {{ 'now'|date('Y') }}<div class="pull-right"> Responsable du site: {{ webmaster }} </div>
+          </div>
+        </nav>
+      </div>
+    </footer>
   </div>
-
+  {# filter='?uglifyjs2' #}
   {% block javascripts %}
-    {# Ajoutez ces lignes JavaScript si vous comptez vous servir des fonctionnalités du bootstrap Twitter #}
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    {% javascripts
+      'js/jquery-2.2.2.js'
+      'js/bootstrap.js'
+      '@ozyxPlatformBundle/Resources/public/js/*'
+      %}
+      <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
   {% endblock %}
-
 </body>
 </html>

@@ -12,8 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-//use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Ivory\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormEvent;
@@ -26,7 +26,8 @@ class AdvertType extends AbstractType
     $builder
       ->add('title',      TextType::class)
       ->add('author',     TextType::class)
-      ->add('content',    TextareaType::class)
+      //->add('content',     TextType::class)
+      ->add('content',    CKEditorType::class)
       ->add('image',      ImageType::class)
       ->add('published',  CheckboxType::class)
 
@@ -35,7 +36,6 @@ class AdvertType extends AbstractType
           'choice_label'  => 'name',
           'multiple'      => true,
           'expanded'      => true,
-
       ))
 
       ->add('Enregistrer', SubmitType::class)

@@ -3,15 +3,16 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: "@ozyxPlatformBundle/Resources/config/services.yml" }
+    - { resource: "@UserBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: en
+    locale: fr
 
 framework:
     #esi:             ~
-    #translator:      { fallbacks: ["%locale%"] }
+    translator:      { fallback: ["%locale%"] }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -79,7 +80,6 @@ stof_doctrine_extensions:
 
 #Configuration de la bibliothèque pour manipuler les images
 liip_imagine:
-
     resolvers:
         default:
             web_path:
@@ -113,8 +113,13 @@ liip_imagine:
 assetic:
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
+    #node: C:/Users/Pangloss/AppData/Roaming/npm/nodejs
     filters:
         cssrewrite: ~
+        #uglifyjs2:
+            #bin: /usr/local/bin/uglifyjs #C:/Users/Pangloss/AppData/Roaming/npm/uglifyjs
+        #uglifycss:
+            #bin: /usr/local/bin/uglifycss# C:/Users/Pangloss/AppData/Roaming/npm/uglifycss
 
 vich_uploader:
     db_driver: orm # or mongodb or propel or phpcr
@@ -127,3 +132,15 @@ vich_uploader:
             inject_on_load:     false
             delete_on_update:   true
             delete_on_remove:   true
+
+fos_user:
+    db_driver:     orm                       # Le type de BDD à utiliser, nous utilisons l'ORM Doctrine depuis le début
+    firewall_name: main                      # Le nom du firewall derrière lequel on utilisera ces utilisateurs
+    user_class:    ozyx\UserBundle\Entity\User # La classe de l'entité User que nous utilisons
+
+# Activation de l'extension Twig intl
+services:
+    twig.extension.intl:
+        class: Twig_Extensions_Extension_Intl
+        tags:
+            - { name: twig.extension }

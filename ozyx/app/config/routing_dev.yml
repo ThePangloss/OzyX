@@ -12,3 +12,11 @@ _errors:
 
 _main:
     resource: routing.yml
+
+_console:
+    resource: "@CoreSphereConsoleBundle/Resources/config/routing.yml"
+    prefix: /
+
+ozyx_platform_translation:
+    path:     /{_locale}/traduction/{name}
+    defaults: { _controller: ozyxPlatformBundle:Advert:translation }

@@ -2,19 +2,23 @@
 services:
     ozyx_platform.antispam:
         class: ozyx\PlatformBundle\Antispam\ozyxAntispam
-        arguments: ['@mailer', %locale%, 50]
-
-    ozyx_platform.doctrine.notification:
-        class: ozyx\PlatformBundle\DoctrineListener\ApplicationNotification
-        arguments: ['@mailer']
+        arguments: ['@mailer', 50]
         tags:
-            - { name: doctrine.event_listener, event: postPersist }
+            - { name: twig.extension }
+        calls:
+            - [ setLocale, [ %locale% ] ]
+
+#    ozyx_platform.doctrine.notification:
+#        class: ozyx\PlatformBundle\DoctrineListener\ApplicationNotification
+#       arguments: ['@mailer']
+#        tags:
+#            - { name: doctrine.event_listener, event: postPersist }
 
     ozyx_platform.listener:
         class: ozyx\PlatformBundle\DoctrineListener\ozyxVideCacheImagine
         arguments: ["@liip_imagine.cache.manager", '@request_stack']
         tags:
-            - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: postUpdate }
             - { name: doctrine.event_listener, event: preRemove }
 
     ozyx_platform.validator.antiflood:
@@ -22,3 +26,22 @@ services:
         arguments: ['@request_stack', '@doctrine.orm.entity_manager']
         tags:
             - { name: validator.constraint_validator, alias: ozyx_platform_antiflood }
+
+#    ozyx_platform.beta.html:
+#        class: ozyx\PlatformBundle\Beta\BetaHTML
+
+#    ozyx_platform.beta.listener:
+#        class: ozyx\PlatformBundle\Beta\BetaListener
+#        arguments: ['@ozyx_platform.beta.html', "2016-04-20"]
+#        tags:
+#            - { name: kernel.event_listener, event: kernel.response, method: processBeta }
+#    
+#    ozyx_platform.censorship_processor:
+#        class:     ozyx\PlatformBundle\Bigbrother\CensorshipProcessor
+#        arguments: [@mailer]
+#
+#    ozyx_platform.censorship_listener:
+#        class:     ozyx\PlatformBundle\Bigbrother\CensorshipListener
+#        arguments: [@ozyx_platform.censorship_processor, [1, 2, 3]]
+#        tags:
+#            - { name: kernel.event_listener, event: ozyx_platform.bigbrother.post_message, method: processMessage }

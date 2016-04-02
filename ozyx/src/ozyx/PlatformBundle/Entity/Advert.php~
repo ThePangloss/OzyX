@@ -67,7 +67,6 @@ class Advert
 
     /**
     * @ORM\Column(name="ip", type="string", length=255)
-    * @Assert\Ip(message= "L'adresse IP est incorrecte.")
     */
     protected $ip;
 
@@ -491,5 +490,15 @@ class Advert
     public function getIp()
     {
         return $this->ip;
+    }
+
+    /**
+     * Get imageCache
+     *
+     * @return string
+     */
+    public function imageCache()
+    {
+        return $this->getImage()->GetOldCacheStrip();
     }
 }

@@ -1,6 +1,30 @@
 ozyx_platform:
     resource: "@ozyxPlatformBundle/Resources/config/routing.yml"
-    prefix:   /platform
+    prefix:   /{_locale}/platform
+    requirements:
+        _locale: en|fr|de
+
+ozyx_user:
+    resource: "@UserBundle/Resources/config/routing.yml"
+    prefix:   /
+
+fos_user_security:
+    resource: "@UserBundle/Resources/config/routing.yml"
+
+fos_user_profile:
+    resource: "@UserBundle/Resources/config/routing.yml"
+
+fos_user_register:
+    resource: "@UserBundle/Resources/config/routing.yml"
+
+fos_user_resetting:
+    resource: "@UserBundle/Resources/config/routing.yml"
+
+fos_user_change_password:
+    resource: "@UserBundle/Resources/config/routing.yml"
+
+fos_user_group:
+    resource: "@UserBundle/Resources/config/routing.yml"
 
 app:
     resource: "@AppBundle/Controller/"
